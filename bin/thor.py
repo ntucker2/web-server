@@ -39,10 +39,25 @@ def main():
     verbose = False
 
     # Parse command line arguments
-    pass
+    arguments = sys.argv[1:]
+    files = []
+    if not len(arguments):
+        usage(1)
+    else:
+        while len(arguments):
+            arg = arguments.pop(0)
+            if arg == '-h':
+                hammers = arg.pop(0)
+            elif arg == '-t':
+                throws = arg.pop(0)
+            elif arg == '-v':
+                verbose = True;
+
 
     # Create pool of workers and perform throws
-    pass
+    args = ((url, throws, verbose, hid))
+    with concurrent.futures.ProcessPoolExecutor(cores) as executor:
+        ans = executor.map(do_hammer, args)
 
 # Main execution
 
