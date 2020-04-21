@@ -89,6 +89,9 @@ int main(int argc, char *argv[]) {
     ServerMode mode;
 
     /* Parse command line options */
+    if(!parse_options(argc, argv[], mode)){
+        return EXIT_FAILURE;
+    }
 
     /* Listen to server socket */
 
