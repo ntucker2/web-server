@@ -82,8 +82,13 @@ const char * http_status_string(Status status) {
         "500 Internal Server Error",
         "418 I'm A Teapot",
     };
-
-    return NULL;
+    
+    if(status < sizeof(StatusStrings) / sizeof(char *)){
+        return StatusStrings[status];
+    }
+    else{
+        return NULL;
+    }
 }
 
 /**
@@ -93,6 +98,8 @@ const char * http_status_string(Status status) {
  * @return  Point to first whitespace character in s.
  **/
 char * skip_nonwhitespace(char *s) {
+    while(!isspace(*s))
+        s++;
     return s;
 }
 
@@ -103,6 +110,8 @@ char * skip_nonwhitespace(char *s) {
  * @return  Point to first non-whitespace character in s.
  **/
 char * skip_whitespace(char *s) {
+    while(isspace(s))
+        s++;
     return s;
 }
 
