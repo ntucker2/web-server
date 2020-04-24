@@ -105,9 +105,11 @@ Status  handle_browse_request(Request *r) {
         if(!streq(entries[i]->d_name, ".") && !streq(entries[i]->d_name, "..")){        
             if(streq(r->uri, "/")){
                 fprintf(r->stream, "<li><a href=\"%s\">%s</a></li>", entries[i]->d_name, entries[i]->d_name);
+                fprintf(r->stream, "\n");
             }
             else{
-            fprintf(r->stream, "<li><a href=\"%s%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name);
+                fprintf(r->stream, "<li><a href=\"%s%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name);
+                fprintf(r->stream, "\n");
             }
             free(entries[i]);
         }
