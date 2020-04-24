@@ -32,11 +32,14 @@
  * This function returns an allocated string that must be free'd.
  **/
 char * determine_mimetype(const char *path) {
+    debug("hey look ma i made it");
     char *mimetype;
-    char *token;
+    char *temp;
 
     /* Find file extension */
-    char *ext = strtok((char *)path, ".");
+    char *token = strchr(path, '.');
+    token++; // skip past the .
+    debug("token is %s", token);
 
     /* Open MimeTypesPath file */
     FILE *fs = fopen(MimeTypesPath, "r");
@@ -48,20 +51,21 @@ char * determine_mimetype(const char *path) {
     char buffer[BUFSIZ];
     while(fgets(buffer, BUFSIZ, fs)){
         mimetype = strtok(buffer, WHITESPACE);
-        token = skip_whitespace(skip_nonwhitespace(buffer));
-        while(token){
-            if(strncmp(ext, token, strlen(ext)) == 0){
+        debug("mimetype is %s", mimetype);
+        temp = skip_whitespace(strtok(NULL, WHITESPACE));
+        while(temp){
+            debug("temp is %s", temp);
+            if(strncmp(token, temp, strlen(token)) == 0){
                 return strdup(mimetype);
             }
-            token = skip_nonwhitespace(token);
-            token = skip_whitespace(token);
+            temp = skip_whitespace(strtok(NULL, WHITESPACE));
         }
     }
     
     return DefaultMimeType;
 }
 
-/** DONE BUT TOTALLY COULD BE WRONG
+/** DONE
  * Determine actual filesystem path based on RootPath and URI.
  *
  * @param   uri         Resource path of URI.
@@ -120,7 +124,7 @@ const char * http_status_string(Status status) {
  * @return  Point to first whitespace character in s.
  **/
 char * skip_nonwhitespace(char *s) {
-    while(s && !isspace(*s))
+    while(*s && !isspace(*s))
         s++;
     return s;
 }
@@ -132,7 +136,7 @@ char * skip_nonwhitespace(char *s) {
  * @return  Point to first non-whitespace character in s.
  **/
 char * skip_whitespace(char *s) {
-    while(s && isspace(*s))
+    while(*s && isspace(*s))
         s++;
     return s;
 }
