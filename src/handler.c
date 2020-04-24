@@ -201,12 +201,26 @@ Status  handle_cgi_request(Request *r) {
     /* Export CGI environment variables from request headers */
     Header * h = r->headers;
     while(h!= NULL){
-        if(strcmp(h->name, "Host")){
+        if(streq(h->name, "Host")){
             setenv("HTTP_HOST", h->data, 1);    
         }
-        else if(strcmp(h->name, "User-Agent")){
+        else if(streq(h->name, "Accept")){
+            setenv("HTTP_ACCEPT", h->data, 1);
+        }
+        else if(streq(h->name, "Accept-Language")){
+            setenv("HTTP_ACCEPT_LANGUAGE", h->data, 1);
+        }
+        else if(streq(h->name, "Accept-Encoding")){
+            setenv("HTTP_ACCEPT_ENCODING", h->data, 1);
+        }
+        else if(streq(h->name, "Connection")){
+            setenv("HTTP_CONNECTION", h->data, 1);
+        }
+        else if(streq(h->name, "User-Agent")){
             setenv("HTTP_USER_AGENT", h->data, 1);
         }
+
+   // host, accept, accept language, accept encoding, connection
         h = h->next;
     }
 
@@ -222,7 +236,7 @@ Status  handle_cgi_request(Request *r) {
     char buffer[BUFSIZ];
     size_t nread = fread(buffer, 1, BUFSIZ, pfs);
     while (nread > 0){
-        debug("buffer is %s", 
+        //debug("buffer is %s", buffer);
         fwrite(buffer, 1, nread, r->stream);
         nread = fread(buffer, 1, BUFSIZ, pfs);
     }

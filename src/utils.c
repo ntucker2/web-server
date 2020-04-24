@@ -32,7 +32,6 @@
  * This function returns an allocated string that must be free'd.
  **/
 char * determine_mimetype(const char *path) {
-    debug("hey look ma i made it");
     char *mimetype;
     char *token;
 
@@ -40,17 +39,16 @@ char * determine_mimetype(const char *path) {
     char *ext = strchr(path, '.');
     if(!ext){
         debug("file extension wasn't found for file %s", path);
-        log("mimetype is %s", DefaultMimeType);
+        debug("\tMIMETYPE: %s", DefaultMimeType);
         return DefaultMimeType;
     }
     ext++; // skip past the .
-    debug("ext is %s", ext);
 
     /* Open MimeTypesPath file */
     FILE *fs = fopen(MimeTypesPath, "r");
     if(!fs){
         debug("fopen failed: %s", strerror(errno));
-        log("mimetype is %s", DefaultMimeType);
+        debug("\tMIMETYPE: %s", DefaultMimeType);
         return DefaultMimeType;
     }
 
@@ -64,13 +62,13 @@ char * determine_mimetype(const char *path) {
         token = strtok(NULL, WHITESPACE);
         while(token){
             if(strcmp(ext, token) == 0){
-                log("mimetype is %s", mimetype);
+                debug("\tMIMETYPE:%s", mimetype);
                 return strdup(mimetype);
             }
             token = strtok(NULL, WHITESPACE);
         }
     }
-    log("mimetype is %s", DefaultMimeType);
+    debug("\tMIMETYPE:%s", DefaultMimeType);
     return DefaultMimeType;
 }
 
