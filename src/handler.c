@@ -135,7 +135,6 @@ Status  handle_browse_request(Request *r) {
 Status  handle_file_request(Request *r) {
     /* Open file for reading */
     FILE *fs = fopen(r->path, "r");
-    debug("tryna open %s - but uri is %s", r->path, r->uri);
     if(!fs){
         return HTTP_STATUS_NOT_FOUND;
     }
@@ -212,15 +211,18 @@ Status  handle_cgi_request(Request *r) {
     }
 
     /* POpen CGI Script */
+    debug("trying to popen %s", r->path);
     pfs = popen(r->path, "r");
     if(!pfs){
         return HTTP_STATUS_INTERNAL_SERVER_ERROR;
     }
+    debug("popened %s",r->path);
     
     /* Copy data from popen to socket */
     char buffer[BUFSIZ];
     size_t nread = fread(buffer, 1, BUFSIZ, pfs);
     while (nread > 0){
+        debug("buffer is %s", 
         fwrite(buffer, 1, nread, r->stream);
         nread = fread(buffer, 1, BUFSIZ, pfs);
     }

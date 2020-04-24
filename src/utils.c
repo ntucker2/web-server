@@ -34,38 +34,47 @@
 char * determine_mimetype(const char *path) {
     debug("hey look ma i made it");
     char *mimetype;
-    char *temp;
+    char *token;
 
     /* Find file extension */
-    char *token = strchr(path, '.');
-    token++; // skip past the .
-    debug("token is %s", token);
+    char *ext = strchr(path, '.');
+    if(!ext){
+        debug("file extension wasn't found for file %s", path);
+        log("mimetype is %s", DefaultMimeType);
+        return DefaultMimeType;
+    }
+    ext++; // skip past the .
+    debug("ext is %s", ext);
 
     /* Open MimeTypesPath file */
     FILE *fs = fopen(MimeTypesPath, "r");
     if(!fs){
         debug("fopen failed: %s", strerror(errno));
+        log("mimetype is %s", DefaultMimeType);
+        return DefaultMimeType;
     }
 
     /* Scan file for matching file extensions */
     char buffer[BUFSIZ];
     while(fgets(buffer, BUFSIZ, fs)){
+        if(buffer[0] == '#'){
+            continue;
+        }
         mimetype = strtok(buffer, WHITESPACE);
-        debug("mimetype is %s", mimetype);
-        temp = skip_whitespace(strtok(NULL, WHITESPACE));
-        while(temp){
-            debug("temp is %s", temp);
-            if(strncmp(token, temp, strlen(token)) == 0){
+        token = strtok(NULL, WHITESPACE);
+        while(token){
+            if(strcmp(ext, token) == 0){
+                log("mimetype is %s", mimetype);
                 return strdup(mimetype);
             }
-            temp = skip_whitespace(strtok(NULL, WHITESPACE));
+            token = strtok(NULL, WHITESPACE);
         }
     }
-    
+    log("mimetype is %s", DefaultMimeType);
     return DefaultMimeType;
 }
 
-/** DONE
+/**
  * Determine actual filesystem path based on RootPath and URI.
  *
  * @param   uri         Resource path of URI.
@@ -92,7 +101,7 @@ char * determine_request_path(const char *uri) {
     return strdup(rp);
 }
 
-/** DONE
+/**
  * Return static string corresponding to HTTP Status code.
  *
  * @param   status      HTTP Status.
@@ -117,7 +126,7 @@ const char * http_status_string(Status status) {
     }
 }
 
-/** DONE
+/**
  * Advance string pointer pass all nonwhitespace characters
  *
  * @param   s           String.
@@ -129,7 +138,7 @@ char * skip_nonwhitespace(char *s) {
     return s;
 }
 
-/** DONE
+/**
  * Advance string pointer pass all whitespace characters
  *
  * @param   s           String.
