@@ -62,7 +62,7 @@ Status  handle_request(Request *r) {
     }
 
     else{
-        handle_error(r, HTTP_STATUS_NOT_FOUND);
+        result = HTTP_STATUS_NOT_FOUND;
     }
 
     if(result != 0){
@@ -74,7 +74,7 @@ Status  handle_request(Request *r) {
     return result;
 }
 
-/**
+/** DONE & PASSES TESTS
  * Handle browse request.
  *
  * @param   r           HTTP Request structure.
@@ -102,15 +102,15 @@ Status  handle_browse_request(Request *r) {
     /* For each entry in directory, emit HTML list item */
     fprintf(r->stream, "<ul>\n");
     for(int i = 0; i < n; i++){
-        if(!streq(entries[i]->d_name, ".") && !streq(entries[i]->d_name, "..")){        
+        if(!streq(entries[i]->d_name, ".")){      
             if(streq(r->uri, "/")){
-                fprintf(r->stream, "<li><a href=\"%s\">%s</a></li>", entries[i]->d_name, entries[i]->d_name);
-                fprintf(r->stream, "\n");
+                fprintf(r->stream, "<li><a href=\"/%s\">%s</a></li>", entries[i]->d_name, entries[i]->d_name);
             }
             else{
-                fprintf(r->stream, "<li><a href=\"%s%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name);
-                fprintf(r->stream, "\n");
+        //        debug("link is %s/%s, text is %s/%s", r->uri, entries[i]->d_name);
+                fprintf(r->stream, "<li><a href=\"%s/%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name);
             }
+            fprintf(r->stream, "\n");
             free(entries[i]);
         }
     }
@@ -135,13 +135,13 @@ Status  handle_browse_request(Request *r) {
 Status  handle_file_request(Request *r) {
     /* Open file for reading */
     FILE *fs = fopen(r->path, "r");
-//    FILE *fs = fopen("spidey.html", "r");
+    debug("tryna open %s - but uri is %s", r->path, r->uri);
     if(!fs){
         return HTTP_STATUS_NOT_FOUND;
     }
 
     /* Determine mimetype */
-    char *mimetype = determine_mimetype(MimeTypesPath);
+    char *mimetype = determine_mimetype(r->path);
 
     /* Write HTTP Headers with OK status and determined Content-Type */
     fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
