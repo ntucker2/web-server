@@ -32,21 +32,36 @@
  * This function returns an allocated string that must be free'd.
  **/
 char * determine_mimetype(const char *path) {
-    char *ext;
     char *mimetype;
     char *token;
-    char buffer[BUFSIZ];
-    FILE *fs = NULL;
 
     /* Find file extension */
+    char *ext = strtok((char *)path, ".");
 
     /* Open MimeTypesPath file */
+    FILE *fs = fopen(MimeTypesPath, "r");
+    if(!fs){
+        debug("fopen failed: %s", strerror(errno));
+    }
 
     /* Scan file for matching file extensions */
-    return NULL;
+    char buffer[BUFSIZ];
+    while(fgets(buffer, BUFSIZ, fs)){
+        mimetype = strtok(buffer, WHITESPACE);
+        token = skip_whitespace(skip_nonwhitespace(buffer));
+        while(token){
+            if(strncmp(ext, token, strlen(ext)) == 0){
+                return strdup(mimetype);
+            }
+            token = skip_nonwhitespace(token);
+            token = skip_whitespace(token);
+        }
+    }
+    
+    return DefaultMimeType;
 }
 
-/**
+/** DONE BUT TOTALLY COULD BE WRONG
  * Determine actual filesystem path based on RootPath and URI.
  *
  * @param   uri         Resource path of URI.
@@ -63,10 +78,17 @@ char * determine_mimetype(const char *path) {
  * string must later be free'd.
  **/
 char * determine_request_path(const char *uri) {
-    return NULL;
+    char realpathchar[BUFSIZ];
+    sprintf(realpathchar, "%s/%s", RootPath, uri);
+
+    char rp[BUFSIZ];
+    if(!realpath(realpathchar, rp) || strncmp(rp, RootPath, strlen(RootPath)) != 0){
+        return NULL;
+    }
+    return strdup(rp);
 }
 
-/**
+/** DONE
  * Return static string corresponding to HTTP Status code.
  *
  * @param   status      HTTP Status.
@@ -91,26 +113,26 @@ const char * http_status_string(Status status) {
     }
 }
 
-/**
+/** DONE
  * Advance string pointer pass all nonwhitespace characters
  *
  * @param   s           String.
  * @return  Point to first whitespace character in s.
  **/
 char * skip_nonwhitespace(char *s) {
-    while(!isspace(*s))
+    while(s && !isspace(*s))
         s++;
     return s;
 }
 
-/**
+/** DONE
  * Advance string pointer pass all whitespace characters
  *
  * @param   s           String.
  * @return  Point to first non-whitespace character in s.
  **/
 char * skip_whitespace(char *s) {
-    while(isspace(s))
+    while(s && isspace(*s))
         s++;
     return s;
 }
