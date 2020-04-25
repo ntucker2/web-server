@@ -32,13 +32,15 @@ Status  handle_request(Request *r) {
 
     /* Parse request */
     if(parse_request(r) != 0) {
-        handle_error(r, HTTP_STATUS_BAD_REQUEST);
+        result = HTTP_STATUS_BAD_REQUEST;
+        goto handle_error;
     }
 
     /* Determine request path */
     r->path = determine_request_path(r->uri);
     if(!r->path){   
-        handle_error(r, HTTP_STATUS_BAD_REQUEST);
+        result = HTTP_STATUS_NOT_FOUND;
+        goto handle_error;
     }
     
     debug("HTTP REQUEST PATH: %s", r->path);
@@ -46,7 +48,7 @@ Status  handle_request(Request *r) {
     /* Dispatch to appropriate request handler type based on file type */
     struct stat s;
     if(stat(r->path, &s) < 0){
-        result = handle_error(r, HTTP_STATUS_BAD_REQUEST);
+        result = HTTP_STATUS_NOT_FOUND;
     }
 
     if(S_ISDIR(s.st_mode)){
@@ -62,19 +64,23 @@ Status  handle_request(Request *r) {
     }
 
     else{
-        result = HTTP_STATUS_NOT_FOUND;
-    }
-
-    if(result != 0){
-        handle_error(r, result);
+        result = HTTP_STATUS_BAD_REQUEST;
     }
 
     log("HTTP REQUEST STATUS: %s", http_status_string(result));
+    
+    if(result != 0){
+        goto handle_error;
+    }
 
+    return result;
+
+handle_error:
+    handle_error(r, result);
     return result;
 }
 
-/** DONE & PASSES TESTS
+/**
  * Handle browse request.
  *
  * @param   r           HTTP Request structure.
@@ -107,12 +113,11 @@ Status  handle_browse_request(Request *r) {
                 fprintf(r->stream, "<li><a href=\"/%s\">%s</a></li>", entries[i]->d_name, entries[i]->d_name);
             }
             else{
-        //        debug("link is %s/%s, text is %s/%s", r->uri, entries[i]->d_name);
                 fprintf(r->stream, "<li><a href=\"%s/%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name);
             }
             fprintf(r->stream, "\n");
-            free(entries[i]);
         }
+        free(entries[i]);
     }
     free(entries);
     fprintf(r->stream, "</ul>");
@@ -192,7 +197,7 @@ Status  handle_cgi_request(Request *r) {
     setenv("DOCUMENT_ROOT", RootPath, 1);
     setenv("QUERY_STRING", r->query, 1);
     setenv("REMOTE_ADDR", r->host, 1);
-    setenv("REQUEST_PORT", r->port, 1);
+    setenv("REMOTE_PORT", r->port, 1);
     setenv("REQUEST_METHOD", r->method, 1);
     setenv("REQUEST_URI", r->uri, 1);
     setenv("SCRIPT_FILENAME", r->path, 1);
@@ -225,21 +230,16 @@ Status  handle_cgi_request(Request *r) {
     }
 
     /* POpen CGI Script */
-    debug("trying to popen %s", r->path);
     pfs = popen(r->path, "r");
     if(!pfs){
         return HTTP_STATUS_INTERNAL_SERVER_ERROR;
     }
-    debug("popened %s",r->path);
     
     /* Copy data from popen to socket */
     char buffer[BUFSIZ];
-    size_t nread = fread(buffer, 1, BUFSIZ, pfs);
-    while (nread > 0){
-        //debug("buffer is %s", buffer);
-        fwrite(buffer, 1, nread, r->stream);
-        nread = fread(buffer, 1, BUFSIZ, pfs);
-    }
+    while(fgets(buffer, BUFSIZ, pfs)){
+        fputs(buffer, r->stream);
+    };
 
     /* Close popen, return OK */
     pclose(pfs);
@@ -259,7 +259,7 @@ Status  handle_error(Request *r, Status status) {
     const char *status_string = http_status_string(status);
 
     /* Write HTTP Header */
-    fprintf(r->stream, "HTTP/1.0 200 OK\r\n");
+    fprintf(r->stream, "HTTP/1.0 %s\r\n", status_string);
     fprintf(r->stream, "Content-Type: text/html\r\n");
     fprintf(r->stream, "\r\n");
 
