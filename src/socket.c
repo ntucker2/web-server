@@ -12,7 +12,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-/** DONE
+/**
 * Allocate socket, bind it, and listen to specified port.
 *
 * @param   port        Port number to bind to and listen on.
