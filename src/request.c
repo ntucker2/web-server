@@ -10,7 +10,7 @@
 int parse_request_method(Request *r);
 int parse_request_headers(Request *r);
 
-/** DONE
+/** 
  * Accept request from server socket.
  *
  * @param   sfd         Server socket file descriptor.
@@ -68,7 +68,7 @@ fail:
     return NULL;
 }
 
-/** DONE
+/**
  * Deallocate request struct.
  *
  * @param   r           Request structure.
@@ -109,7 +109,7 @@ void free_request(Request *r) {
     free(r);
 }
 
-/**DONE
+/**
  * Parse HTTP Request.
  *
  * @param   r           Request structure.
@@ -131,7 +131,7 @@ int parse_request(Request *r) {
     return 0;
 }
 
-/** DONE
+/**
  * Parse HTTP Request Method and URI.
  *
  * @param   r           Request structure.
@@ -168,6 +168,9 @@ int parse_request_method(Request *r) {
     if(query){
         query++;
     }
+    
+    /* Ensure query isn't included in uri */
+    uri = strtok(uri, "?");
 
     /* Record method, uri, and query in request struct */
     r->method = strdup(method);
@@ -189,7 +192,7 @@ fail:
     return -1;
 }
 
-/** DONE
+/**
  * Parse HTTP Request Headers.
  *
  * @param   r           Request structure.
@@ -228,6 +231,8 @@ int parse_request_headers(Request *r) {
         chomp(buffer);
         name = strtok(buffer, ":");
         data = strtok(NULL, "\n");
+        if(!data)
+            goto fail;
         temp = calloc(1, sizeof(Header));
         temp->name = strdup(skip_whitespace(name));    
         temp->data = strdup(skip_whitespace(data));
@@ -242,6 +247,10 @@ int parse_request_headers(Request *r) {
     }
 #endif
     return 0;
+
+fail:  
+    r->headers = curr; 
+    return -1;
 }
 
 /* vim: set expandtab sts=4 sw=4 ts=8 ft=c: */
