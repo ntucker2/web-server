@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
         forking_server(server_fd);
     }
     else{
-    single_server(server_fd);
+        single_server(server_fd);
     }
        
     return EXIT_SUCCESS; // was return status
