@@ -7,7 +7,7 @@
 
 #include <unistd.h>
 
-/** DONE
+/**
  * Handle one HTTP request at a time.
  *
  * @param   sfd         Server socket file descriptor.
