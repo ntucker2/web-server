@@ -32,18 +32,45 @@
  * This function returns an allocated string that must be free'd.
  **/
 char * determine_mimetype(const char *path) {
-    char *ext;
     char *mimetype;
     char *token;
-    char buffer[BUFSIZ];
-    FILE *fs = NULL;
 
     /* Find file extension */
+    char *ext = strchr(path, '.');
+    if(!ext){
+        debug("no extension found for file %s", path);
+        goto def;
+    }
+    ext++; // skip past the .
 
     /* Open MimeTypesPath file */
+    FILE *fs = fopen(MimeTypesPath, "r");
+    if(!fs){
+        debug("fopen failed: %s", strerror(errno));
+        goto def;
+    }
 
     /* Scan file for matching file extensions */
-    return NULL;
+    char buffer[BUFSIZ];
+    while(fgets(buffer, BUFSIZ, fs)){
+        if(buffer[0] == '#'){
+            continue;
+        }
+        mimetype = strtok(buffer, WHITESPACE);
+        token = strtok(NULL, WHITESPACE);
+        while(token){
+            if(strcmp(ext, token) == 0){
+                debug("\tMIMETYPE:%s", mimetype);
+                return strdup(mimetype);
+            }
+            token = strtok(NULL, WHITESPACE);
+        }
+    }
+    goto def;
+
+def:
+    debug("\tMIMETYPE:%s", DefaultMimeType);
+    return strdup(DefaultMimeType);
 }
 
 /**
@@ -63,7 +90,14 @@ char * determine_mimetype(const char *path) {
  * string must later be free'd.
  **/
 char * determine_request_path(const char *uri) {
-    return NULL;
+    char realpathchar[BUFSIZ];
+    sprintf(realpathchar, "%s/%s", RootPath, uri);
+
+    char rp[BUFSIZ];
+    if(!realpath(realpathchar, rp) || strncmp(rp, RootPath, strlen(RootPath)) != 0){
+        return NULL;
+    }
+    return strdup(rp);
 }
 
 /**
@@ -82,8 +116,13 @@ const char * http_status_string(Status status) {
         "500 Internal Server Error",
         "418 I'm A Teapot",
     };
-
-    return NULL;
+    
+    if(status < sizeof(StatusStrings) / sizeof(char *)){
+        return StatusStrings[status];
+    }
+    else{
+        return NULL;
+    }
 }
 
 /**
@@ -93,6 +132,8 @@ const char * http_status_string(Status status) {
  * @return  Point to first whitespace character in s.
  **/
 char * skip_nonwhitespace(char *s) {
+    while(s && !isspace(*s))
+        s++;
     return s;
 }
 
@@ -103,6 +144,8 @@ char * skip_nonwhitespace(char *s) {
  * @return  Point to first non-whitespace character in s.
  **/
 char * skip_whitespace(char *s) {
+    while(s && isspace(*s))
+        s++;
     return s;
 }
 

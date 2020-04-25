@@ -18,16 +18,33 @@
  * handle the request.
  **/
 int forking_server(int sfd) {
-    /* Accept and handle HTTP request */
+    /* Accept and handle HTTP request */    
     while (true) {
     	/* Accept request */
+        Request *request = accept_request(sfd);
+        if(!request){
+            log("Unable to accept request: %s", strerror(errno));
+            continue;
+        }
 
 	/* Ignore children */
+        signal(SIGCHLD, SIG_IGN);
 
 	/* Fork off child process to handle request */
+        pid_t pid = fork();
+        if(pid == 0){
+            debug("handle child connection");
+            close(sfd);
+            handle_request(request);
+            exit(0);
+        }
+        else{
+            free_request(request);
+        }
     }
 
     /* Close server socket */
+    close(sfd);
     return EXIT_SUCCESS;
 }
 

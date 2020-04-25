@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 /* Global Variables */
-char *Port	      = "9898";
+char *Port	      = "9111";
 char *MimeTypesPath   = "/etc/mime.types";
 char *DefaultMimeType = "text/plain";
 char *RootPath	      = "www";
@@ -89,13 +89,20 @@ int main(int argc, char *argv[]) {
     ServerMode mode;
 
     /* Parse command line options */
-    if(!parse_options(argc, argv[], mode)){
+    if(!parse_options(argc, argv, &mode)){
         return EXIT_FAILURE;
     }
 
     /* Listen to server socket */
+    int server_fd = socket_listen(Port);
+    if(server_fd < 0){
+        return EXIT_FAILURE;
+    }
 
     /* Determine real RootPath */
+    char RealRootPath[BUFSIZ];
+    RootPath = realpath(RootPath, RealRootPath);
+
     log("Listening on port %s", Port);
     debug("RootPath        = %s", RootPath);
     debug("MimeTypesPath   = %s", MimeTypesPath);
@@ -103,7 +110,14 @@ int main(int argc, char *argv[]) {
     debug("ConcurrencyMode = %s", mode == SINGLE ? "Single" : "Forking");
 
     /* Start either forking or single HTTP server */
-    return status;
+    if(mode == FORKING){
+        forking_server(server_fd);
+    }
+    else{
+        single_server(server_fd);
+    }
+       
+    return EXIT_SUCCESS; // was return status
 }
 
 /* vim: set expandtab sts=4 sw=4 ts=8 ft=c: */

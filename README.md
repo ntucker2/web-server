@@ -5,7 +5,6 @@ This is the [Final Project] for [CSE 20289 Systems Programming (Spring 2020)].
 ## Members
 
 - Patrick McGrath (pmcgrat3@nd.edu)
-- Commit so Patrick McGrath can show access
 - Nora Tucker (ntucker2@nd.edu)
 
 ## Demonstration
