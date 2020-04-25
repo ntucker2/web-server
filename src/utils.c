@@ -38,9 +38,8 @@ char * determine_mimetype(const char *path) {
     /* Find file extension */
     char *ext = strchr(path, '.');
     if(!ext){
-        debug("file extension wasn't found for file %s", path);
-        debug("\tMIMETYPE: %s", DefaultMimeType);
-        return DefaultMimeType;
+        debug("no extension found for file %s", path);
+        goto def;
     }
     ext++; // skip past the .
 
@@ -48,8 +47,7 @@ char * determine_mimetype(const char *path) {
     FILE *fs = fopen(MimeTypesPath, "r");
     if(!fs){
         debug("fopen failed: %s", strerror(errno));
-        debug("\tMIMETYPE: %s", DefaultMimeType);
-        return DefaultMimeType;
+        goto def;
     }
 
     /* Scan file for matching file extensions */
@@ -68,8 +66,11 @@ char * determine_mimetype(const char *path) {
             token = strtok(NULL, WHITESPACE);
         }
     }
+    goto def;
+
+def:
     debug("\tMIMETYPE:%s", DefaultMimeType);
-    return DefaultMimeType;
+    return strdup(DefaultMimeType);
 }
 
 /**
@@ -131,7 +132,7 @@ const char * http_status_string(Status status) {
  * @return  Point to first whitespace character in s.
  **/
 char * skip_nonwhitespace(char *s) {
-    while(*s && !isspace(*s))
+    while(s && !isspace(*s))
         s++;
     return s;
 }
@@ -143,7 +144,7 @@ char * skip_nonwhitespace(char *s) {
  * @return  Point to first non-whitespace character in s.
  **/
 char * skip_whitespace(char *s) {
-    while(*s && isspace(*s))
+    while(s && isspace(*s))
         s++;
     return s;
 }
