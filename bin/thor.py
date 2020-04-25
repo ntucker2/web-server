@@ -34,7 +34,7 @@ def do_hammer(args):
     return hammer(*args)
 
 def main():
-    hammers = 1
+    hamers = 1
     throws  = 1
     verbose = False
 
