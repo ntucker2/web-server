@@ -18,7 +18,7 @@
  * handle the request.
  **/
 int forking_server(int sfd) {
-    /* Accept and handle HTTP request */
+    /* Accept and handle HTTP request */    
     while (true) {
     	/* Accept request */
         Request *request = accept_request(sfd);
@@ -28,10 +28,12 @@ int forking_server(int sfd) {
         }
 
 	/* Ignore children */
-        int pid = fork();
+        signal(SIGCHLD, SIG_IGN);
 
 	/* Fork off child process to handle request */
+        pid_t pid = fork();
         if(pid == 0){
+            debug("handle child connection");
             close(sfd);
             handle_request(request);
             exit(0);
