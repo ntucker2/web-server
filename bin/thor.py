@@ -27,38 +27,88 @@ def hammer(url, throws, verbose, hid):
 
     Return the average elapsed time of all the throws.
     '''
-    return 0
+    
+    average = 0
+
+    for inter in range(throws):
+        #initializes the first time inside of the loop
+        StartTime = time.time()
+        #Same use of requests.get as from the hints and from reddit.py
+        response = requests.get(url)
+        #get throw time of the request so need to get it right after
+        ThrowTime = time.time() - StartTime
+        #print out the verbose response if desired
+        if verbose:
+            print(response.text)
+        #print out each time there is a request
+        print(f'Hammer: {hid}, Throw:  {throws}, Elapsed Time: {ThrowTime:.2f}')
+        #get average to be able to get all the time
+        average += ThrowTime
+    #need to get the actual average to be able to display it and return it
+    average = average / throws
+    #print the total time for the average time for the individual useae of hammer
+    print(f'Hammer: {hid}, AVERAGE  , Elapsed Time: {average:.2f}')
+    #return
+    return average
 
 def do_hammer(args):
     ''' Use args tuple to call `hammer` '''
+    #very similar to cracker in hulk.py
     return hammer(*args)
 
 def main():
+    
+    #Initialization of the Three main variables for Thor.py
     hammers = 1
     throws  = 1
     verbose = False
+    
+    #Initialization of 'arguments' variable with all parts of command line
+    arguments = sys.argv[1:]
 
     # Parse command line arguments
-    arguments = sys.argv[1:]
-    files = []
+
+    #Checks no-length and immidiatnly goes to usage(1)
     if not len(arguments):
         usage(1)
+    #More occuring outcome where command line is fully parsed
     else:
-        while len(arguments):
+        while len(arguments) and arguments[0].startswith('-'):
+            #Pops each argument individually to have stuff completed by it
             arg = arguments.pop(0)
+            #fills hammers, throws, or verbose with proper values from command line
             if arg == '-h':
-                hammers = arg.pop(0)
+                hammers = int(arguments.pop(0))
             elif arg == '-t':
-                throws = arg.pop(0)
+                throws = int(arguments.pop(0))
             elif arg == '-v':
-                verbose = True;
-
+                verbose = True
+            else:
+                usage(1)
 
     # Create pool of workers and perform throws
-    args = ((url, throws, verbose, hid))
-    with concurrent.futures.ProcessPoolExecutor(cores) as executor:
-        ans = executor.map(do_hammer, args)
+    
+    #url is final argument so take it after parsing
+    url = arguments.pop(0)
+    
+    #I used for __ in __ as it is one of the for implementations for python
+    #and it is often paired with range()
+    args = ((url, throws, verbose, hid) for hid in range(hammers))
 
+    #very similar to how we completed smash in hulk.py
+    with concurrent.futures.ProcessPoolExecutor(hammers) as executor:
+        average = executor.map(do_hammer, args)
+    
+    TotalElapsed = 0
+    NumElapsed = 0
+    for inter in average:
+        TotalElapsed += inter
+        NumElapsed += 1
+
+    print(f'TOTAL AVERAGE ELAPSED TIME: {(TotalElapsed/NumElapsed):.2f}')
+    
+    sys.exit(0)
+    
 # Main execution
 
 if __name__ == '__main__':
