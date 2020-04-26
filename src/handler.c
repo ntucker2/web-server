@@ -38,11 +38,11 @@ Status  handle_request(Request *r) {
 
     /* Determine request path */
     r->path = determine_request_path(r->uri);
-    if(!r->path){   
+    if(!r->path){
         result = HTTP_STATUS_NOT_FOUND;
         goto handle_error;
     }
-    
+
     debug("HTTP REQUEST PATH: %s", r->path);
 
     /* Dispatch to appropriate request handler type based on file type */
@@ -58,7 +58,7 @@ Status  handle_request(Request *r) {
     else if(s.st_mode & S_IXUSR){
         result = handle_cgi_request(r);
     }
-    
+
     else if(s.st_mode){
         result = handle_file_request(r);
     }
@@ -68,7 +68,7 @@ Status  handle_request(Request *r) {
     }
 
     log("HTTP REQUEST STATUS: %s", http_status_string(result));
-    
+
     if(result != 0){
         goto handle_error;
     }
@@ -108,7 +108,7 @@ Status  handle_browse_request(Request *r) {
     /* For each entry in directory, emit HTML list item */
     fprintf(r->stream, "<ul>\n");
     for(int i = 0; i < n; i++){
-        if(!streq(entries[i]->d_name, ".")){      
+        if(!streq(entries[i]->d_name, ".")){
             if(streq(r->uri, "/")){
                 fprintf(r->stream, "<li><a href=\"/%s\">%s</a></li>", entries[i]->d_name, entries[i]->d_name);
             }
@@ -172,7 +172,7 @@ Status  handle_file_request(Request *r) {
 
 fail:
     /* Close file, free mimetype, return INTERNAL_SERVER_ERROR */
-    fclose(fs); 
+    fclose(fs);
     free(mimetype);
     return HTTP_STATUS_INTERNAL_SERVER_ERROR;
 }
@@ -207,7 +207,7 @@ Status  handle_cgi_request(Request *r) {
     Header * h = r->headers;
     while(h!= NULL){
         if(streq(h->name, "Host")){
-            setenv("HTTP_HOST", h->data, 1);    
+            setenv("HTTP_HOST", h->data, 1);
         }
         else if(streq(h->name, "Accept")){
             setenv("HTTP_ACCEPT", h->data, 1);
@@ -234,7 +234,7 @@ Status  handle_cgi_request(Request *r) {
     if(!pfs){
         return HTTP_STATUS_INTERNAL_SERVER_ERROR;
     }
-    
+
     /* Copy data from popen to socket */
     char buffer[BUFSIZ];
     while(fgets(buffer, BUFSIZ, pfs)){
@@ -268,7 +268,7 @@ Status  handle_error(Request *r, Status status) {
     fprintf(r->stream, "<h2>you really messed up this time</h2>");
     fprintf(r->stream, "<p>enjoy these vines to make up for it</p>");
     fprintf(r->stream, "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/k8crP4uXRpc\" frameborder=\"0\" allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>");
-
+    fprintf(r->stream, "<audio controls><source src=\"dontlookinthisfolder/memez.m4a\"><div style=\"border: 1px solid black ; padding: 8px ;\">Sorry, your browser does not support the <audio> tag used in this demo.</div></audio>");
     /* Return specified status */
     return status;
 }
