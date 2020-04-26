@@ -30,7 +30,7 @@ def hammer(url, throws, verbose, hid):
     
     average = 0
 
-    for inter in throws:
+    for inter in range(throws):
         #initializes the first time inside of the loop
         StartTime = time.time()
         #Same use of requests.get as from the hints and from reddit.py
@@ -39,15 +39,15 @@ def hammer(url, throws, verbose, hid):
         ThrowTime = time.time() - StartTime
         #print out the verbose response if desired
         if verbose:
-            print(response)
+            print(response.text)
         #print out each time there is a request
-        printf(f'Hammer: {hid}, Throw:  {throws}, Elapsed Time: {ThrowTime:.2f}')
+        print(f'Hammer: {hid}, Throw:  {throws}, Elapsed Time: {ThrowTime:.2f}')
         #get average to be able to get all the time
         average += ThrowTime
     #need to get the actual average to be able to display it and return it
     average = average / throws
     #print the total time for the average time for the individual useae of hammer
-    printf(f'Hammer: {hid}, AVERAGE  , Elapsed Time: {average:.2f}')
+    print(f'Hammer: {hid}, AVERAGE  , Elapsed Time: {average:.2f}')
     #return
     return average
 
@@ -73,14 +73,14 @@ def main():
         usage(1)
     #More occuring outcome where command line is fully parsed
     else:
-        while len(arguments):
+        while len(arguments) and arguments[0].startswith('-'):
             #Pops each argument individually to have stuff completed by it
             arg = arguments.pop(0)
             #fills hammers, throws, or verbose with proper values from command line
             if arg == '-h':
-                hammers = arguments.pop(0)
+                hammers = int(arguments.pop(0))
             elif arg == '-t':
-                throws = arguments.pop(0)
+                throws = int(arguments.pop(0))
             elif arg == '-v':
                 verbose = True
             else:
@@ -89,7 +89,7 @@ def main():
     # Create pool of workers and perform throws
     
     #url is final argument so take it after parsing
-    url = arguments.pop(0) 
+    url = arguments.pop(0)
     
     #I used for __ in __ as it is one of the for implementations for python
     #and it is often paired with range()
@@ -99,8 +99,16 @@ def main():
     with concurrent.futures.ProcessPoolExecutor(hammers) as executor:
         average = executor.map(do_hammer, args)
     
-    print(f'TOTAL AVERAGE ELAPSED TIME: {average:.2f}')
+    TotalElapsed = 0
+    NumElapsed = 0
+    for inter in average:
+        TotalElapsed += inter
+        NumElapsed += 1
 
+    print(f'TOTAL AVERAGE ELAPSED TIME: {(TotalElapsed/NumElapsed):.2f}')
+    
+    sys.exit(0)
+    
 # Main execution
 
 if __name__ == '__main__':
