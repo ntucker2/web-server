@@ -41,7 +41,7 @@ def hammer(url, throws, verbose, hid):
         if verbose:
             print(response.text)
         #print out each time there is a request
-        print(f'Hammer: {hid}, Throw:  {throws}, Elapsed Time: {ThrowTime:.2f}')
+        print(f'Hammer: {hid}, Throw:  {inter}, Elapsed Time: {ThrowTime:.2f}')
         #get average to be able to get all the time
         average += ThrowTime
     #need to get the actual average to be able to display it and return it
