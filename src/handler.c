@@ -268,7 +268,6 @@ Status  handle_error(Request *r, Status status) {
     fprintf(r->stream, "<h2>you really messed up this time</h2>");
     fprintf(r->stream, "<p>enjoy these vines to make up for it</p>");
     fprintf(r->stream, "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/k8crP4uXRpc\" frameborder=\"0\" allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>");
-    fprintf(r->stream, "<audio controls><source src=\"dontlookinthisfolder/memez.m4a\"><div style=\"border: 1px solid black ; padding: 8px ;\">Sorry, your browser does not support the <audio> tag used in this demo.</div></audio>");
     /* Return specified status */
     return status;
 }
