@@ -127,10 +127,10 @@ Status  handle_browse_request(Request *r) {
           fprintf(r->stream, "<li><a href=\"/%s\">%s</a></li>", entries[i]->d_name, entries[i]->d_name);
         }
         else{
-          fprintf(r->stream, "<li><a href=\"%s/%s\">%s</a></li>\n", r->uri, entries[i]->d_name, entries[i]->d_name);
+          fprintf(r->stream, "<li><a href=\"%s/%s\">%s</a></li>", r->uri, entries[i]->d_name, entries[i]->d_name);
         }
-        fprintf(r->stream, "\n");
       }
+      fprintf(r->stream, "\n");
     }
     if(mimetype){
         free(mimetype);
