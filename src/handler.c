@@ -106,15 +106,14 @@ Status  handle_browse_request(Request *r) {
   fprintf(r->stream, "\r\n");
 
   /* For each entry in directory, emit HTML list item */
-  char mimetype[BUFSIZ];
-  char * mimetype2;
+  char buffer[BUFSIZ];
+  char * mimetype = NULL;
   fprintf(r->stream, "<ul>\n");
   for(int i = 0; i < n; i++){
     if(!streq(entries[i]->d_name, ".")){
-      sprintf(mimetype, "%s/%s", r->path, entries[i]->d_name);
-      mimetype2 = determine_mimetype(mimetype);
-      if(strncmp(mimetype2, "image", strlen("image")) == 0){
-        debug("%s/%s", r->uri, entries[i]->d_name);
+      sprintf(buffer, "%s/%s", r->path, entries[i]->d_name);
+      mimetype = determine_mimetype(buffer);
+      if(strncmp(mimetype, "image", strlen("image")) == 0){
         if(streq(r->uri, "/")){
             fprintf(r->stream, "<li><a href=\"/%s\"> <img src=\"/%s\" alt=\"%s\" height=50 width=50> </a></li>", entries[i]->d_name, entries[i]->d_name, entries[i]->d_name);
 
@@ -132,6 +131,9 @@ Status  handle_browse_request(Request *r) {
         }
         fprintf(r->stream, "\n");
       }
+    }
+    if(mimetype){
+        free(mimetype);
     }
     free(entries[i]);
   }
