@@ -10,6 +10,7 @@ This is the [Final Project] for [CSE 20289 Systems Programming (Spring 2020)].
 ## Demonstration
 
 - [Video can be found here](https://drive.google.com/open?id=1xwwW7KJSIqeCrwWhHXLnZ58lux0c9qgc)
+- [Video with Additional Guru Points](https://drive.google.com/open?id=1Cd_as4RpGY6zPIJra59-OpFBVniOV-F3)
 
 ## Errata
 
