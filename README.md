@@ -1,30 +1,9 @@
-# Project - README
-I am just modifying this as a test really quickly
-This is the [Final Project] for [CSE 20289 Systems Programming (Spring 2020)].
+# Web Server - README
 
-## Members
+## Project Overview:
+This is a basic HTTP server that supports directory listings, static files, and CGI scripts. I coded all programs associated with spidey.c which can be executed for a web server. Additionally, there are examples of test scripts that I authored to test the latency and throughput of my server.
+** Also in this repository is a HTTP web client, which was authored by my project partner.
 
-- Patrick McGrath (pmcgrat3@nd.edu)
-- Nora Tucker (ntucker2@nd.edu)
-
-## Demonstration
-
+## Project Demonstration Videos:
 - [Video can be found here](https://drive.google.com/open?id=1xwwW7KJSIqeCrwWhHXLnZ58lux0c9qgc)
-- [Video with Additional Guru Points](https://drive.google.com/open?id=1Cd_as4RpGY6zPIJra59-OpFBVniOV-F3)
-
-## Errata
-
-As far as we know, everything works well! We pass all test scripts, have no
-valgrind errors, and our manual testing has shown nothing but success
-
-## Contributions
-Patrick: thor.py, most of the testing
-
-Nora: spidey, ran some tests, coded the guru points after discussing
-them with Patrick
-
-Both of us worked closely together and helped with understanding concepts -
-we simply split up the code to make it easier to keep track of changes
-
-[Final Project]: https://www3.nd.edu/~pbui/teaching/cse.20289.sp20/project.html
-[CSE 20289 Systems Programming (Spring 2020)]: https://www3.nd.edu/~pbui/teaching/cse.20289.sp20/
+- [Video with Guru Points (Additional Tasks)](https://drive.google.com/open?id=1Cd_as4RpGY6zPIJra59-OpFBVniOV-F3)
